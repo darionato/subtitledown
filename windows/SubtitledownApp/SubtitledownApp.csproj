@@ -12,7 +12,7 @@
     <AssemblyName>SubtitledownApp</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ApplicationIcon>sbd_ico.ico</ApplicationIcon>
+    <ApplicationIcon>sub_down_0.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -103,6 +103,7 @@
     <EmbeddedResource Include="icons\sub_down_3.png" />
     <EmbeddedResource Include="icons\sub_down_0.png" />
     <Content Include="sbd_ico.ico" />
+    <Content Include="sub_down_0.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
