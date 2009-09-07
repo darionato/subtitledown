@@ -44,16 +44,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Subtitledown\Subtitledown\clDirSubNice.cs">
+    <Compile Include="..\..\lib\clDirSubNice.cs">
       <Link>clDirSubNice.cs</Link>
     </Compile>
-    <Compile Include="..\..\Subtitledown\Subtitledown\clFileTitleName.cs">
+    <Compile Include="..\..\lib\clFileTitleName.cs">
       <Link>clFileTitleName.cs</Link>
     </Compile>
-    <Compile Include="..\..\Subtitledown\Subtitledown\clSubtitledown.cs">
+    <Compile Include="..\..\lib\clSubtitledown.cs">
       <Link>clSubtitledown.cs</Link>
     </Compile>
-    <Compile Include="..\..\Subtitledown\Subtitledown\clUnzipper.cs">
+    <Compile Include="..\..\lib\clUnzipper.cs">
       <Link>clUnzipper.cs</Link>
     </Compile>
     <Compile Include="frmMain.cs">
