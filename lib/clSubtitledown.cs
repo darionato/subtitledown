@@ -55,6 +55,13 @@ namespace Badlydone.Subtitledown
 
         }
 
+        void StartWatcherDirectories()
+        {
+
+            
+
+        }
+
         void m_workback_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             m_InProgress = false;
