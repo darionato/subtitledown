@@ -36,8 +36,10 @@ namespace Badlydone.Subtitledown
 			
             m_sBaseUrl = @"http://www.italiansubs.net/";
             m_RegExp = "<td><h3>.*?href=\"([^\"]*?)\">([^<]*)</a>";
-            m_RegExpEpisode = "<dd><img.*?href=\"([^\\\"]*?)\">([^<]*)</a>";
-            m_RegExpDownload = ".*?href=\"(.*?fname=([^\\&]*)&amp.*?) rel=\"nofollow\">";
+            //m_RegExpEpisode = "<dd><img.*?href=\"([^\\\"]*?)\">([^<]*)</a>";
+            m_RegExpEpisode = "<dd><a href=\"([^\"]*?)\"><img.*?href=\"([^\"]*?)\">([^<]*)</a>";
+            //m_RegExpDownload = ".*?href=\"(.*?fname=([^\\&]*)&amp.*?) rel=\"nofollow\">";
+            m_RegExpDownload = ".*rel=\"nofollow\"*?href=\"(.*?fname=([^\\&]*)&amp.*?)>";
 
             m_sUserName = "aaa";
             m_sPassword = "aaa";
@@ -130,16 +132,31 @@ namespace Badlydone.Subtitledown
 			m_Prc_file_down = string.Empty;
 			
             string loginUri = m_sBaseUrl + "index.php";
-            string reqString = "option=com_smf&action=login2&user=" + m_sUserName + "&passwrd=" + m_sPassword;
+            string reqString = ""; //&task=login&username=" + m_sUserName + "&passwd=" + m_sPassword;
+            //string reqString = "option=com_smf&action=login2&user=" + m_sUserName + "&passwrd=" + m_sPassword;
+            //http://www.italiansubs.net/index.php?option=com_remository&Itemid=6
+            
+            ASCIIEncoding encoding = new ASCIIEncoding();
+            string postData = "option=com_user&task=login&silent=true&username=" + m_sUserName + "&passwd=" + m_sPassword;
+            byte[] datapost = encoding.GetBytes(postData);
+
 
             WebClient client = new WebClient();
 			
             CookieContainer cc = new CookieContainer();
-            HttpWebRequest loginRequest = (HttpWebRequest)WebRequest.Create(loginUri + "?" + reqString);
+            HttpWebRequest loginRequest = (HttpWebRequest)WebRequest.Create(loginUri);// + "?" + reqString);
 
+            loginRequest.Headers.Add("Accept-Encoding", "gzip,deflate");
+            loginRequest.ContentType = "application/x-www-form-urlencoded";
+            loginRequest.ContentLength = datapost.Length;
             loginRequest.Proxy = null;
             loginRequest.CookieContainer = cc;
-            loginRequest.Method = "GET";
+            loginRequest.Method = "POST";
+            Stream newStream = loginRequest.GetRequestStream();
+            newStream.Write(datapost, 0, datapost.Length);
+            newStream.Close();
+
+            
 
             HttpWebResponse loginResponse = (HttpWebResponse)loginRequest.GetResponse();
             
@@ -275,7 +292,7 @@ namespace Badlydone.Subtitledown
             foreach (Match match in fileMatches)
             {
                 String ep = m_Serie.Telefilm + " " + m_Serie.Serie.ToString() + "x" + String.Format("{0:00}", m_Serie.Puntata);
-                if (match.Groups[2].Value.Trim().ToLower() == ep.Trim().ToLower())
+                if (match.Groups[3].Value.Trim().ToLower() == ep.Trim().ToLower())
                 {
                     retValue = match.Groups[1].Value;
                     break;
