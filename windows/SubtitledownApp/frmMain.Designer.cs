@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -164,10 +165,11 @@
             this.toolStripSeparator1,
             this.toolStripEsci});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(155, 98);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(155, 120);
             // 
             // toolStripApri
             // 
+            this.toolStripApri.Image = ((System.Drawing.Image)(resources.GetObject("toolStripApri.Image")));
             this.toolStripApri.Name = "toolStripApri";
             this.toolStripApri.Size = new System.Drawing.Size(154, 22);
             this.toolStripApri.Text = "Apri";
@@ -175,6 +177,7 @@
             // 
             // ToolStripAllinea
             // 
+            this.ToolStripAllinea.Image = ((System.Drawing.Image)(resources.GetObject("ToolStripAllinea.Image")));
             this.ToolStripAllinea.Name = "ToolStripAllinea";
             this.ToolStripAllinea.Size = new System.Drawing.Size(154, 22);
             this.ToolStripAllinea.Text = "Allinea cartelle";
@@ -182,6 +185,7 @@
             // 
             // toolStripPreferenze
             // 
+            this.toolStripPreferenze.Image = ((System.Drawing.Image)(resources.GetObject("toolStripPreferenze.Image")));
             this.toolStripPreferenze.Name = "toolStripPreferenze";
             this.toolStripPreferenze.Size = new System.Drawing.Size(154, 22);
             this.toolStripPreferenze.Text = "Preferenze";
@@ -194,6 +198,7 @@
             // 
             // toolStripEsci
             // 
+            this.toolStripEsci.Image = ((System.Drawing.Image)(resources.GetObject("toolStripEsci.Image")));
             this.toolStripEsci.Name = "toolStripEsci";
             this.toolStripEsci.Size = new System.Drawing.Size(154, 22);
             this.toolStripEsci.Text = "Esci";
@@ -220,7 +225,9 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "frmMain";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

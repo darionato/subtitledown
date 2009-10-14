@@ -38,8 +38,8 @@ namespace Badlydone.Subtitledown
             m_RegExp = "<td><h3>.*?href=\"([^\"]*?)\">([^<]*)</a>";
             //m_RegExpEpisode = "<dd><img.*?href=\"([^\\\"]*?)\">([^<]*)</a>";
             m_RegExpEpisode = "<dd><a href=\"([^\"]*?)\"><img.*?href=\"([^\"]*?)\">([^<]*)</a>";
-            //m_RegExpDownload = ".*?href=\"(.*?fname=([^\\&]*)&amp.*?) rel=\"nofollow\">";
-            m_RegExpDownload = ".*rel=\"nofollow\"*?href=\"(.*?fname=([^\\&]*)&amp.*?)>";
+            m_RegExpDownload = "<a href=\"(.*)\" rel=\"nofollow\">";
+            //m_RegExpDownload = ".*rel=\"nofollow\"*?href=\"(.*?fname=([^\\&]*)&amp.*?)>";
 
             m_sUserName = "aaa";
             m_sPassword = "aaa";
@@ -130,36 +130,35 @@ namespace Badlydone.Subtitledown
         public void DownloadSub()
         {
 			m_Prc_file_down = string.Empty;
-			
-            string loginUri = m_sBaseUrl + "index.php";
-            string reqString = ""; //&task=login&username=" + m_sUserName + "&passwd=" + m_sPassword;
-            //string reqString = "option=com_smf&action=login2&user=" + m_sUserName + "&passwrd=" + m_sPassword;
-            //http://www.italiansubs.net/index.php?option=com_remository&Itemid=6
-            
-            ASCIIEncoding encoding = new ASCIIEncoding();
-            string postData = "option=com_user&task=login&silent=true&username=" + m_sUserName + "&passwd=" + m_sPassword;
-            byte[] datapost = encoding.GetBytes(postData);
 
+            string loginUri = m_sBaseUrl; // +"index.php";
+            string reqString = string.Format("username={0}&passwd={1}&option=com_user&task=login",m_sUserName,m_sPassword);
 
             WebClient client = new WebClient();
-			
-            CookieContainer cc = new CookieContainer();
-            HttpWebRequest loginRequest = (HttpWebRequest)WebRequest.Create(loginUri);// + "?" + reqString);
 
-            loginRequest.Headers.Add("Accept-Encoding", "gzip,deflate");
-            loginRequest.ContentType = "application/x-www-form-urlencoded";
-            loginRequest.ContentLength = datapost.Length;
+            // open the request
+            CookieContainer cc = new CookieContainer();
+            Uri website_url = new Uri(loginUri);
+            HttpWebRequest loginRequest = (HttpWebRequest)WebRequest.Create(website_url);// + "?" + reqString);
+
+            // create post params
+            UTF8Encoding enc = new UTF8Encoding();
+            byte[] post = enc.GetBytes(reqString);
+
+            //loginRequest.UserAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3 (.NET CLR 3.5.30729)";
             loginRequest.Proxy = null;
             loginRequest.CookieContainer = cc;
             loginRequest.Method = "POST";
-            Stream newStream = loginRequest.GetRequestStream();
-            newStream.Write(datapost, 0, datapost.Length);
-            newStream.Close();
-
+            loginRequest.ContentType = "application/x-www-form-urlencoded";
+            loginRequest.ContentLength = post.Length;
             
+
+            Stream pass_post = loginRequest.GetRequestStream();
+            pass_post.Write(post,0,post.Length);
+            pass_post.Close();
 
             HttpWebResponse loginResponse = (HttpWebResponse)loginRequest.GetResponse();
-            
+
 
             WebHeaderCollection headerCookies = new WebHeaderCollection();
             String cookieHeader = "";
@@ -309,8 +308,12 @@ namespace Badlydone.Subtitledown
             foreach (Match match in matches)
             {
                 String dir = m_Dir_Download;
-                
-                String archiveFile = dir + Path.DirectorySeparatorChar + match.Groups[2].Value;
+
+                String archiveFile = dir + Path.DirectorySeparatorChar +
+                        string.Format("{0}.S{1}E{2}.zip",
+                                        m_Serie.Telefilm,
+                                        m_Serie.Serie,
+                                        m_Serie.Puntata).Replace(" ", ".");
 
                 String url = match.Groups[1].Value.Replace("&amp;", "&");
                 
@@ -322,9 +325,10 @@ namespace Badlydone.Subtitledown
                     System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(archiveFile));
 				
 				Console.WriteLine("Download file {0} on the directory {1}",url ,archiveFile);
-                client.DownloadFile(url, archiveFile);
-				
-				// extract the file
+                
+                File.WriteAllBytes(archiveFile, client.DownloadData(new Uri(url)));
+
+                // extract the file
                 using (clUnzipper estrai = new clUnzipper())
                 {
                     string[] lista = estrai.Estrai(archiveFile);
@@ -333,7 +337,7 @@ namespace Badlydone.Subtitledown
                     {
                         if (x == 0)
                         {
-                            
+
                             if (this.InfoSerie.File.Length > 0)
                             {
                                 m_Prc_file_down = Path.GetFileNameWithoutExtension(this.InfoSerie.File) + ".srt";
