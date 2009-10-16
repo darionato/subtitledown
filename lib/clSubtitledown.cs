@@ -115,6 +115,10 @@ namespace Badlydone.Subtitledown
             {
                 System.Windows.Forms.Application.DoEvents();
             }
+            while (m_workback.IsBusy)
+            {
+                System.Windows.Forms.Application.DoEvents();
+            }
 		}
 		
 		public void DownloadSubAsynch()
