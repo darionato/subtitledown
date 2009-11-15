@@ -59,9 +59,7 @@ namespace Badlydone.Subtitledown
 
         void StartWatcherDirectories()
         {
-
-            
-
+			throw  new Exception("Method not implemented!");
         }
 
         void m_workback_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -111,7 +109,8 @@ namespace Badlydone.Subtitledown
 		
 		public void WaitDone()
 		{
-            while (m_InProgress)
+#if WIN32
+			while (m_InProgress)
             {
                 System.Windows.Forms.Application.DoEvents();
             }
@@ -119,6 +118,17 @@ namespace Badlydone.Subtitledown
             {
                 System.Windows.Forms.Application.DoEvents();
             }
+				
+#else
+	   		while (m_InProgress)
+        	{
+				while (GLib.MainContext.Iteration());
+        	}
+			while (m_workback.IsBusy)
+            {
+               while (GLib.MainContext.Iteration());
+            }
+#endif
 		}
 		
 		public void DownloadSubAsynch()
