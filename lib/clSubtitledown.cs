@@ -147,25 +147,20 @@ namespace Badlydone.Subtitledown
 
             string loginUri = m_sBaseUrl; // +"index.php";
             string reqString = string.Format("username={0}&passwd={1}&option=com_user&task=login",m_sUserName,m_sPassword);
-            //string reqString = "username=aaa&passwd=aaa&remember=yes&Submit=Login&option=com_user&task=login&silent=true&return=aHR0cDovL3d3dy5pdGFsaWFuc3Vicy5uZXQv&9c44f26eddc6d232a4b9111ecf288ac9=1";
+            
             WebClient client = new WebClient();
 
             // open the request
             CookieContainer cc = new CookieContainer();
             Uri website_url = new Uri(loginUri);
-            HttpWebRequest loginRequest = (HttpWebRequest)WebRequest.Create(website_url); // + "?" + reqString);
-
-            // create post params
-            UTF8Encoding enc = new UTF8Encoding();
-            byte[] post = enc.GetBytes(reqString);
+            HttpWebRequest loginRequest = (HttpWebRequest)WebRequest.Create(website_url);
             
-
-            //loginRequest.UserAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3 (.NET CLR 3.5.30729)";
+			
             loginRequest.Proxy = null;
             loginRequest.CookieContainer = cc;
             loginRequest.Method = "GET";
             loginRequest.ContentType = "application/x-www-form-urlencoded";
-            loginRequest.ContentLength = post.Length;
+           	
 
             // get response
             HttpWebResponse loginResponse = (HttpWebResponse)loginRequest.GetResponse();
@@ -187,6 +182,9 @@ namespace Badlydone.Subtitledown
             // now set for the POST
             loginRequest = (HttpWebRequest)WebRequest.Create(website_url);
 
+			// create post params
+            UTF8Encoding enc = new UTF8Encoding();
+            byte[] post = enc.GetBytes(reqString);
 
             loginRequest.Proxy = null;
             loginRequest.CookieContainer = cc;
