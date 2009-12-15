@@ -43,6 +43,8 @@ namespace Badlydone.Subtitledown
 		public void WorkOutSubDir(string directory)
 		{
 
+            bool isconn = false;
+
             m_SubDown.DirDownload = directory;
 
 			clFileTitleName Parse_video = new clFileTitleName();
@@ -57,11 +59,14 @@ namespace Badlydone.Subtitledown
                     clInfoSerie serie = Parse_video.getInfoSerie(sto_file.Name);
                     if (serie.Telefilm.Length > 0)
                     {
+
+                        if (isconn == false) isconn = m_SubDown.Connect();
+
                         m_SubDown.InfoSerie = serie;
 
                         if (m_Sincrono)
                         {
-                            m_SubDown.DownloadSub();
+                            m_SubDown.getSubTitle();
                         }
                         else
                         {
@@ -82,8 +87,9 @@ namespace Badlydone.Subtitledown
                     this.WorkOutSubDir(the_dir.FullName);
                 }
             }
-			
-			
+
+            m_SubDown.Disconect();
+
 		}
 		
 	}
