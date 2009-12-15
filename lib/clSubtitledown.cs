@@ -31,6 +31,10 @@ namespace Badlydone.Subtitledown
 		private String m_Dir_Download = String.Empty;
 		private String m_Prc_file_down = String.Empty;
 
+        private WebClient client = null;
+        private string loginUri;
+        public bool _Connected = false;
+
         public clSubtitledown()
         {
 			
@@ -71,7 +75,14 @@ namespace Badlydone.Subtitledown
         {
             try
             {
-                DownloadSub();
+                if (_Connected == true)
+                {
+                    getSubTitle();
+                }
+                else
+                {
+                    DownloadSub();
+                }
             }
             catch (Exception ex)
             {
@@ -108,8 +119,8 @@ namespace Badlydone.Subtitledown
         }
 		
 		public void WaitDone()
-		{
-#if WIN32
+        {
+#if !WIN32
 			while (m_InProgress)
             {
                 System.Windows.Forms.Application.DoEvents();
@@ -120,11 +131,11 @@ namespace Badlydone.Subtitledown
             }
 				
 #else
-	   		while (m_InProgress)
-        	{
-				while (GLib.MainContext.Iteration());
-        	}
-			while (m_workback.IsBusy)
+            while (m_InProgress)
+            {
+                while (GLib.MainContext.Iteration());
+            }
+            while (m_workback.IsBusy)
             {
                while (GLib.MainContext.Iteration());
             }
@@ -143,24 +154,33 @@ namespace Badlydone.Subtitledown
 		
         public void DownloadSub()
         {
-			m_Prc_file_down = string.Empty;
 
-            string loginUri = m_sBaseUrl; // +"index.php";
-            string reqString = string.Format("username={0}&passwd={1}&option=com_user&task=login",m_sUserName,m_sPassword);
-            
-            WebClient client = new WebClient();
+            this.Connect();
+
+            this.getSubTitle();
+
+            this.Disconect();
+
+        }
+
+        public bool Connect()
+        {
+            loginUri = m_sBaseUrl; // +"index.php";
+            string reqString = string.Format("username={0}&passwd={1}&option=com_user&task=login", m_sUserName, m_sPassword);
+
+            client = new WebClient();
 
             // open the request
             CookieContainer cc = new CookieContainer();
             Uri website_url = new Uri(loginUri);
             HttpWebRequest loginRequest = (HttpWebRequest)WebRequest.Create(website_url);
-            
-			
+
+
             loginRequest.Proxy = null;
             loginRequest.CookieContainer = cc;
             loginRequest.Method = "GET";
             loginRequest.ContentType = "application/x-www-form-urlencoded";
-           	
+
 
             // get response
             HttpWebResponse loginResponse = (HttpWebResponse)loginRequest.GetResponse();
@@ -174,7 +194,7 @@ namespace Badlydone.Subtitledown
             }
 
             headerCookies.Add("Cookie", cookieHeader);
-			
+
             //add login cookie to webClient
             client.Headers.Add(headerCookies);
 
@@ -182,7 +202,7 @@ namespace Badlydone.Subtitledown
             // now set for the POST
             loginRequest = (HttpWebRequest)WebRequest.Create(website_url);
 
-			// create post params
+            // create post params
             UTF8Encoding enc = new UTF8Encoding();
             byte[] post = enc.GetBytes(reqString);
 
@@ -192,18 +212,28 @@ namespace Badlydone.Subtitledown
             loginRequest.ContentType = "application/x-www-form-urlencoded";
             loginRequest.ContentLength = post.Length;
 
-            
+
             // send the password
             Stream pass_post = loginRequest.GetRequestStream();
-            pass_post.Write(post,0,post.Length);
+            pass_post.Write(post, 0, post.Length);
             pass_post.Close();
-            
-            loginResponse = (HttpWebResponse)loginRequest.GetResponse();
-            
-			loginResponse.Close();
 
-            
-            
+            loginResponse = (HttpWebResponse)loginRequest.GetResponse();
+
+            loginResponse.Close();
+
+            _Connected = true;
+
+            return true;
+
+        }
+
+        public bool getSubTitle()
+        {
+
+            m_Prc_file_down = string.Empty;
+
+
             Stream data = null;
             StreamReader reader = null;
             String sPage = String.Empty;
@@ -218,19 +248,19 @@ namespace Badlydone.Subtitledown
             String sSeriesPageURL = String.Empty;
             String sSeasonPageURL = String.Empty;
             String sEpisodePageURL = String.Empty;
-            
+
             sSeriesPageURL = matchSeries(sPage, client);
 
             if (sSeriesPageURL.Length == 0)
             {
                 Console.WriteLine("Series not found!");
-				m_InProgress = false;
-                return;
-            } 
-            
+                m_InProgress = false;
+                return false;
+            }
+
             Console.WriteLine("Series found!");
 
-			//check the season
+            //check the season
             data = client.OpenRead(sSeriesPageURL);
             reader = new StreamReader(data);
             sPage = reader.ReadToEnd().Replace('\0', ' ');
@@ -240,13 +270,13 @@ namespace Badlydone.Subtitledown
             if (sSeasonPageURL.Length == 0)
             {
                 Console.WriteLine("Season not found!");
-				m_InProgress = false;
-                return;
+                m_InProgress = false;
+                return false;
             }
-			
-			Console.WriteLine("Season found!");
 
-			//check the episode
+            Console.WriteLine("Season found!");
+
+            //check the episode
             data = client.OpenRead(sSeasonPageURL);
             reader = new StreamReader(data);
             sPage = reader.ReadToEnd().Replace('\0', ' ');
@@ -256,12 +286,12 @@ namespace Badlydone.Subtitledown
             if (sEpisodePageURL.Length == 0)
             {
                 Console.WriteLine("Episode not found!");
-				m_InProgress = false;
-                return;
+                m_InProgress = false;
+                return false;
             }
 
-			Console.WriteLine("Episode found!");
-			
+            Console.WriteLine("Episode found!");
+
             data = client.OpenRead(sEpisodePageURL);
             reader = new StreamReader(data);
             sPage = reader.ReadToEnd().Replace('\0', ' ');
@@ -270,13 +300,25 @@ namespace Badlydone.Subtitledown
             {
                 Console.WriteLine("No login");
                 client.Dispose();
-                return;
+                return false;
             }
 
             episodeSubtitleDownload(client, sPage);
 
-            client.Dispose();
+            return true;
+        }
 
+        public void Disconect()
+        {
+            try
+            {
+                client.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            _Connected = false;
         }
 
         private String matchSeries(String sPage, WebClient client)
