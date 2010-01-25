@@ -240,6 +240,9 @@ namespace SubtitledownApp
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+
+            if (e.CloseReason == CloseReason.WindowsShutDown) m_Close = true;
+
             if (m_Close == false)
             {
                 e.Cancel = true;
