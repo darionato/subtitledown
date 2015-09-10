@@ -1,0 +1,12 @@
+syntax:glob
+*.suo
+windows/SubtitledownApp/bin
+windows/SubtitledownApp/obj
+*.pyc
+*.zip
+*.sdf
+*.user
+*.log
+*.log.*
+*.rej
+*.orig

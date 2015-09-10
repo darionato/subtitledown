@@ -62,17 +62,28 @@ namespace SubtitledownApp
             if (ds.Tables.Count > 0)
             {
 
-                DataTable tb_dir = ds.Tables["directories"];
+                var tbDir = ds.Tables["directories"];
+                var tbOptions = ds.Tables["options"];
 
-                if (tb_dir == null) return;
+                var userName = "";
+                var password = "";
+
+                foreach (DataRow row in tbOptions.Rows)
+                {
+                    if (row[0].ToString() == "user") userName = row[1].ToString();
+                    if (row[0].ToString() == "pass") password = row[1].ToString();
+                }
+
+
+                if (tbDir == null) return;
 
                 this.TrayIconWorking = true;
-                foreach (DataRow riga in tb_dir.Rows)
+                foreach (DataRow riga in tbDir.Rows)
                 {
 
                     if (Directory.Exists(riga[0].ToString()) == true)
                     {
-                        this.AllineaCartella(riga[0].ToString());
+                        this.AllineaCartella(riga[0].ToString(), userName, password);
                     }
 
                 }
@@ -82,10 +93,10 @@ namespace SubtitledownApp
 
         }
 
-        private void AllineaCartella(string percorso)
+        private void AllineaCartella(string percorso, string userName, string password)
         {
 
-            clDirSubNice dir_align = new clDirSubNice();
+            clDirSubNice dir_align = new clDirSubNice(userName, password);
             dir_align.Sincrono = chkSincrono.Checked;
             dir_align.Ricorsivo = chkAllineaSubDir.Checked;
             dir_align.Directory = percorso;
@@ -139,7 +150,7 @@ namespace SubtitledownApp
             {
                 this.TrayIconWorking = true;
                 this.lblProcesso.Text = "Inizio allineamento in corso...";
-                this.AllineaCartella(il_open.SelectedPath);
+                this.AllineaCartella(il_open.SelectedPath, "", "");
                 this.lblProcesso.Text = "Allineamento completato";
                 this.TrayIconWorking = false;
             }

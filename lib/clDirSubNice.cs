@@ -12,9 +12,11 @@ namespace Badlydone.Subtitledown
         private bool m_Sincrono = false;
         private bool m_Ricorsivo = false;
 
-		public clDirSubNice()
+		public clDirSubNice(string userName, string password)
 		{
 			m_SubDown = new clSubtitledown();
+		    m_SubDown.UserName = userName;
+		    m_SubDown.Password = password;
 		}
 
         public bool Sincrono
@@ -50,9 +52,13 @@ namespace Badlydone.Subtitledown
 			clFileTitleName Parse_video = new clFileTitleName();
 
             DirectoryInfo info_dir = new DirectoryInfo(directory);
-			
-            foreach(FileInfo sto_file in info_dir.GetFiles("*.avi"))
+
+            foreach(FileInfo sto_file in info_dir.GetFiles())
             {
+
+                if (!sto_file.Extension.Equals(".avi") && !sto_file.Extension.Equals(".mkv") &&
+                    !sto_file.Extension.Equals(".mp4")) continue;
+
                 if (File.Exists(Path.Combine(directory, Path.GetFileNameWithoutExtension(sto_file.FullName) + ".srt")) == false)
                 {
 
@@ -73,7 +79,7 @@ namespace Badlydone.Subtitledown
                             m_SubDown.DownloadSubAsynch();
                             m_SubDown.WaitDone();
                         }
-						
+
                     }
 
                 }

@@ -45,8 +45,8 @@ namespace Badlydone.Subtitledown
             m_RegExpDownload = "<a href=\"(.*)\" rel=\"nofollow\">";
             //m_RegExpDownload = ".*rel=\"nofollow\"*?href=\"(.*?fname=([^\\&]*)&amp.*?)>";
 
-            m_sUserName = "aaa";
-            m_sPassword = "aaa";
+            m_sUserName = "";
+            m_sPassword = "";
             m_Serie = new clInfoSerie();
 
             Engine = new Regex(m_RegExp, RegexOptions.IgnoreCase);
@@ -60,6 +60,9 @@ namespace Badlydone.Subtitledown
             m_workback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(m_workback_RunWorkerCompleted);
 
         }
+
+        public string UserName { get { return m_sUserName; } set { m_sUserName = value; } }
+        public string Password { get { return m_sPassword; } set { m_sPassword = value; } }
 
         void StartWatcherDirectories()
         {
